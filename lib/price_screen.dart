@@ -8,7 +8,26 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency ='USD';
+  Map<String, String> coinValues = {};
+  bool isWaiting = false;
 
+  void getData() async {
+    isWaiting = true;
+    try {
+      var data = await CoinData().getCoinData(selectedCurrency);
+      setState(() {
+        isWaiting = false;
+        coinValues = data;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -19,6 +38,7 @@ class _PriceScreenState extends State<PriceScreen> {
       );
     }).toList();
 
+    var crypto;
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
@@ -36,11 +56,11 @@ class _PriceScreenState extends State<PriceScreen> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 $crypto = ${isWaiting ? '?' : coinValues[crypto]} $selectedCurrency',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20.0,
                     color: Colors.white,
                   ),
